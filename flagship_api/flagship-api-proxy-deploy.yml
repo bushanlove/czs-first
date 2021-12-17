@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flagship-api-argocd-ops-test-proxy-deploy
+  namespace: argocd
+  labels:
+    app: flagship-api-argocd-ops-test-proxy
+spec:
+  selector:
+    matchLabels:
+      app: flagship-api-argocd-ops-test-proxy
+  replicas: 1
+  template:
+    metadata:
+      name: flagship-api-argocd-ops-test-proxy
+      labels:
+        app: flagship-api-argocd-ops-test-proxy
+    spec:
+      containers:
+        - image: docker.io/library/nginx:latest
+          name: flagship-api-argocd-ops-test-proxy
+          resources:
+            requests:
+              memory: "50Mi"
+              cpu: "100m"
+            limits:
+              memory: "50Mi"
+              cpu: "100m"
+          ports:
+            - name: http
+              containerPort: 80
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+            - name: config
+              mountPath: /etc/nginx/sitesavailable/gogoinsight-test.syriusrobotics.com.conf
+              subPath: gogoinsight-test.syriusrobotics.com.conf
+      volumes:
+        - name: config
+          configMap:
+            name: flagship-api-argocd-ops-test-proxy-config
